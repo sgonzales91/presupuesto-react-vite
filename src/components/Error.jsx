@@ -1,6 +1,6 @@
-const Error = ({mensaje}) => {
+const Error = ({children, tipo}) => {
   return (
-    <div>{mensaje}</div>
+    <div className={`alerta ${tipo}`}>{children}</div>
   )
 }
 
