@@ -1,16 +1,27 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import cerrarBtn from '../img/cerrar.svg'
 import Error from './Error'
 
-const Modal = ({setModal, animarModal, setAnimarModal, guardarGasto}) => {
+const Modal = ({setModal, animarModal, setAnimarModal, guardarGasto, gastoEditar, setGastoEditar, gastos, setGastos}) => {
     const [concepto, setConcepto] = useState('')
     const [montoGasto, setMontoGasto] = useState('')
     const [categoria, setCategoria] = useState('')
     const [mensaje, setMensaje] = useState('')
 
+    useEffect(() => {
+        if(Object.keys(gastoEditar).length > 0){
+          console.log("gastoEditar tiene datos desde modal")
+          
+            setConcepto(gastoEditar.concepto)
+            setMontoGasto(gastoEditar.montoGasto)
+            setCategoria(gastoEditar.categoria)
+            
+        }
+    },[gastoEditar])
+
  const ocultarModal = () =>{
     setAnimarModal(false)
-
+    setGastoEditar({})
     setTimeout(() => {
         setModal(false)
     }, 500);
@@ -26,10 +37,34 @@ const Modal = ({setModal, animarModal, setAnimarModal, guardarGasto}) => {
             setMensaje('')
         }, 2000);
         return;
-    }
-    guardarGasto({concepto,montoGasto,categoria})
+    }else{
+        const objGasto = {
+            concepto,
+            montoGasto,
+            categoria
+        }
+    
+    if(gastoEditar.id){
+        //estamos editando un gasto
+        console.log("editando un gasto")
+        objGasto.id = gastoEditar.id
+        objGasto.fecha = gastoEditar.fecha
 
-    ocultarModal()
+        const nuevoArregloGastos = gastos.map(gastoState => (
+            gastoState.id === gastoEditar.id ? objGasto : gastoState
+        ))
+        setGastos(nuevoArregloGastos)
+        setGastoEditar({})
+        ocultarModal()
+    }
+    else{
+        //estamos ingresando un nuevo gasto
+        //guardarGasto({concepto,montoGasto,categoria})
+        guardarGasto(objGasto)
+        ocultarModal()
+    }
+}
+
 
   }
   return (
@@ -41,7 +76,7 @@ const Modal = ({setModal, animarModal, setAnimarModal, guardarGasto}) => {
 
     </div>
     <form onSubmit={handleNuevoGasto} className={`formulario ${animarModal ? 'animar' : 'cerrar'}`}>
-        <legend>Nuevo Gasto</legend>
+        <legend>{gastoEditar.id ? "Editar Gasto" : "Nuevo Gasto" }</legend>
         {mensaje && <Error tipo = "error">{mensaje}</Error>}
         <div className='campo'>
         <label htmlFor='concepto'>Concepto:</label>
@@ -60,14 +95,14 @@ const Modal = ({setModal, animarModal, setAnimarModal, guardarGasto}) => {
             <option value="ahorro">Ahorro</option>
             <option value="comida">Comida</option>
             <option value="casa">Casa</option>
-            <option value="gastos varios">Gastos Varios</option>
+            <option value="gastos">Gastos Varios</option>
             <option value="ocio">Ocio</option>
             <option value="salud">Salud</option>
             <option value="suscripciones">Suscripciones</option>
         </select>
         </div>
 
-        <input type="submit" value="Guardar Gasto"/>
+        <input type="submit" value={gastoEditar.id ? "Guardar Cambios" :"Guardar Gasto"}/>
     </form>
         
     </div>

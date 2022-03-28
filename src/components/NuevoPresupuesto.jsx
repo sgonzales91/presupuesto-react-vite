@@ -7,8 +7,8 @@ const NuevoPresupuesto = ({presupuesto, setPresupuesto, isSetPresupuestoValido})
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if(presupuesto < 0){
-            guardarError("el presupuesto no puede ser negativo")
+        if(presupuesto <= 0){
+            guardarError("Ingrese un Presupuesto Válido")
             return;
         }
 
